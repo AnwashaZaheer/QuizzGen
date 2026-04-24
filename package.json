@@ -1,0 +1,7 @@
+{
+  "name": "quizzgenerate-root",
+  "private": true,
+  "scripts": {
+    "start": "cd quizzgenerate && npm start"
+  }
+}
