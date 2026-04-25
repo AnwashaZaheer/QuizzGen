@@ -1,5 +1,21 @@
 const API_KEY = process.env.OPENROUTER_API_KEY;
 
+function parseJsonBody(req) {
+    return new Promise((resolve, reject) => {
+        let body = '';
+        req.on('data', chunk => body += chunk);
+        req.on('end', () => {
+            if (!body) return resolve({});
+            try {
+                resolve(JSON.parse(body));
+            } catch (err) {
+                reject(err);
+            }
+        });
+        req.on('error', reject);
+    });
+}
+
 module.exports = async function handler(req, res) {
     res.setHeader('Access-Control-Allow-Origin', '*');
     res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
@@ -12,7 +28,7 @@ module.exports = async function handler(req, res) {
         return res.status(500).json({ error: 'OPENROUTER_API_KEY is not set in environment variables' });
     }
 
-    const { model, messages, temperature, max_tokens } = req.body;
+    const { model, messages, temperature, max_tokens } = await parseJsonBody(req);
 
     if (!model || !messages) {
         return res.status(400).json({ error: 'Missing required fields: model, messages' });
